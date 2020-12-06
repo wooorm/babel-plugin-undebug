@@ -76,7 +76,10 @@ function variableDeclarator(nodePath, state) {
     nodePath.node.init.type === 'CallExpression' &&
     nodePath.node.init.callee &&
     nodePath.node.init.callee.type === 'CallExpression' &&
-    nodePath.node.init.callee.callee.name === 'require'
+    nodePath.node.init.callee.callee.name === 'require' &&
+    nodePath.node.init.callee.arguments &&
+    nodePath.node.init.callee.arguments[0] &&
+    nodePath.node.init.callee.arguments[0].value === 'debug'
   ) {
     instances.push(nodePath.node.id.name)
     nodePath.remove()
