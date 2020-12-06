@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-undebug",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Babel plugin to remove `debug` from code",
   "license": "MIT",
   "keywords": [
