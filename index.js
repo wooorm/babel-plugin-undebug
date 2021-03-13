@@ -1,7 +1,5 @@
 // Mini script for us to remove `debug` calls, slightly based on `unassert`.
-module.exports = undebug
-
-function undebug() {
+export default function undebug() {
   return {
     visitor: {
       ImportDeclaration: importDeclaration,

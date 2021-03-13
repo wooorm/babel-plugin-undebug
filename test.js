@@ -1,8 +1,6 @@
-'use strict'
-
-var test = require('tape')
-var babel = require('@babel/core')
-var plugin = require('.')
+import test from 'tape'
+import babel from '@babel/core'
+import plugin from './index.js'
 
 test('babel-plugin-undebug', function (t) {
   t.equal(transform(''), '', 'should not crash on an empty file')

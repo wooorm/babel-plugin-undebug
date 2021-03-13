@@ -11,6 +11,9 @@ production.
 
 ## Install
 
+This package is ESM only: Node 12+ is needed to use it and it must be `import`ed
+instead of `require`d.
+
 [npm][]:
 
 ```sh
@@ -44,6 +47,9 @@ value++;
 ```
 
 ## API
+
+This package exports no identifiers.
+There is only a default export.
 
 ### `babel-plugin-undebug`
 
