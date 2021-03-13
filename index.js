@@ -1,4 +1,14 @@
-// Mini script for us to remove `debug` calls, slightly based on `unassert`.
+/**
+ * @typedef {import('@babel/core').PluginPass} PluginPass
+ * @typedef {import('@babel/core').NodePath} NodePath
+ * @typedef {import('@babel/core').PluginObj} PluginObj
+ */
+
+/**
+ * Mini script to remove `debug` calls, slightly based on `unassert`.
+ *
+ * @returns {PluginObj}
+ */
 export default function undebug() {
   return {
     visitor: {
@@ -7,93 +17,131 @@ export default function undebug() {
       VariableDeclarator: variableDeclarator
     }
   }
-}
 
-function importDeclaration(nodePath, state) {
-  var modules = state.undebugModules || (state.undebugModules = [])
+  /**
+   * Handle an import declaration.
+   *
+   * @param {NodePath} p
+   * @param {PluginPass} state
+   */
+  function importDeclaration(p, state) {
+    /** @type {string[]} */
+    // @ts-ignore
+    var modules = state.undebugModules || (state.undebugModules = [])
 
-  if (
-    nodePath.node.source.value === 'debug' &&
-    nodePath.node.specifiers &&
-    nodePath.node.specifiers[0]
-  ) {
-    modules.push(nodePath.node.specifiers[0].local.name)
-    nodePath.remove()
-  }
-}
-
-function callExpression(nodePath, state) {
-  var modules = state.undebugModules || (state.undebugModules = [])
-  var instances = state.undebugInstances || (state.undebugInstances = [])
-
-  // `d()` (where `d` was previously defined to be a debug instance).
-  if (
-    nodePath.parentPath &&
-    nodePath.parentPath.node.type === 'ExpressionStatement' &&
-    nodePath.node.callee.type === 'Identifier' &&
-    instances.includes(nodePath.node.callee.name)
-  ) {
-    nodePath.remove()
-    return
+    if (
+      p.node.type === 'ImportDeclaration' &&
+      p.node.source.value === 'debug' &&
+      p.node.specifiers &&
+      p.node.specifiers[0]
+    ) {
+      modules.push(p.node.specifiers[0].local.name)
+      p.remove()
+    }
   }
 
-  // `d()()` (where `d` was previously defined to be a debug module).
-  if (
-    nodePath.parentPath &&
-    nodePath.parentPath.node.type === 'CallExpression' &&
-    nodePath.node.callee.type === 'Identifier' &&
-    modules.includes(nodePath.node.callee.name)
-  ) {
-    nodePath.parentPath.remove()
-  }
-}
+  /**
+   * Handle a call expression.
+   *
+   * @param {NodePath} p
+   * @param {PluginPass} state
+   */
+  function callExpression(p, state) {
+    /** @type {string[]} */
+    // @ts-ignore
+    var modules = state.undebugModules || (state.undebugModules = [])
+    /** @type {string[]} */
+    // @ts-ignore
+    var instances = state.undebugInstances || (state.undebugInstances = [])
 
-function variableDeclarator(nodePath, state) {
-  var modules = state.undebugModules || (state.undebugModules = [])
-  var instances = state.undebugInstances || (state.undebugInstances = [])
+    // `d()` (where `d` was previously defined to be a debug instance).
+    if (
+      p.parentPath &&
+      p.parentPath.node.type === 'ExpressionStatement' &&
+      p.node.type === 'CallExpression' &&
+      p.node.callee.type === 'Identifier' &&
+      instances.includes(p.node.callee.name)
+    ) {
+      p.remove()
+      return
+    }
 
-  // `var d = require('debug')`
-  if (
-    nodePath.node.id.type === 'Identifier' &&
-    nodePath.node.init &&
-    nodePath.node.init.type === 'CallExpression' &&
-    nodePath.node.init.callee.name === 'require' &&
-    nodePath.node.init.arguments &&
-    nodePath.node.init.arguments[0] &&
-    nodePath.node.init.arguments[0].value === 'debug'
-  ) {
-    modules.push(nodePath.node.id.name)
-    nodePath.remove()
-    return
-  }
-
-  // `var a = require('debug')('a')`
-  if (
-    nodePath.node.id.type === 'Identifier' &&
-    nodePath.node.init &&
-    nodePath.node.init.type === 'CallExpression' &&
-    nodePath.node.init.callee &&
-    nodePath.node.init.callee.type === 'CallExpression' &&
-    nodePath.node.init.callee.callee.name === 'require' &&
-    nodePath.node.init.callee.arguments &&
-    nodePath.node.init.callee.arguments[0] &&
-    nodePath.node.init.callee.arguments[0].value === 'debug'
-  ) {
-    instances.push(nodePath.node.id.name)
-    nodePath.remove()
-    return
+    // `d()()` (where `d` was previously defined to be a debug module).
+    if (
+      p.parentPath &&
+      p.parentPath.node.type === 'CallExpression' &&
+      p.node.type === 'CallExpression' &&
+      p.node.callee.type === 'Identifier' &&
+      modules.includes(p.node.callee.name)
+    ) {
+      p.parentPath.remove()
+    }
   }
 
-  // `var a = d('a')` (where `d` is previously defined to be a debug module).
-  if (
-    nodePath.node.id.type === 'Identifier' &&
-    nodePath.node.init &&
-    nodePath.node.init.type === 'CallExpression' &&
-    nodePath.node.init.callee &&
-    nodePath.node.init.callee.type === 'Identifier' &&
-    modules.includes(nodePath.node.init.callee.name)
-  ) {
-    instances.push(nodePath.node.id.name)
-    nodePath.remove()
+  /**
+   * Handle a call expression.
+   *
+   * @param {NodePath} p
+   * @param {PluginPass} state
+   */
+  function variableDeclarator(p, state) {
+    /** @type {string[]} */
+    // @ts-ignore
+    var modules = state.undebugModules || (state.undebugModules = [])
+    /** @type {string[]} */
+    // @ts-ignore
+    var instances = state.undebugInstances || (state.undebugInstances = [])
+
+    // `var d = require('debug')`
+    if (
+      p.node.type === 'VariableDeclarator' &&
+      p.node.id.type === 'Identifier' &&
+      p.node.init &&
+      p.node.init.type === 'CallExpression' &&
+      p.node.init.callee.type === 'Identifier' &&
+      p.node.init.callee.name === 'require' &&
+      p.node.init.arguments &&
+      p.node.init.arguments[0] &&
+      p.node.init.arguments[0].type === 'StringLiteral' &&
+      p.node.init.arguments[0].value === 'debug'
+    ) {
+      modules.push(p.node.id.name)
+      p.remove()
+      return
+    }
+
+    // `var a = require('debug')('a')`
+    if (
+      p.node.type === 'VariableDeclarator' &&
+      p.node.id.type === 'Identifier' &&
+      p.node.init &&
+      p.node.init.type === 'CallExpression' &&
+      p.node.init.callee &&
+      p.node.init.callee.type === 'CallExpression' &&
+      p.node.init.callee.callee.type === 'Identifier' &&
+      p.node.init.callee.callee.name === 'require' &&
+      p.node.init.callee.arguments &&
+      p.node.init.callee.arguments[0] &&
+      p.node.init.callee.arguments[0].type === 'StringLiteral' &&
+      p.node.init.callee.arguments[0].value === 'debug'
+    ) {
+      instances.push(p.node.id.name)
+      p.remove()
+      return
+    }
+
+    // `var a = d('a')` (where `d` is previously defined to be a debug module).
+    if (
+      p.node.type === 'VariableDeclarator' &&
+      p.node.id.type === 'Identifier' &&
+      p.node.init &&
+      p.node.init.type === 'CallExpression' &&
+      p.node.init.callee &&
+      p.node.init.callee.type === 'Identifier' &&
+      modules.includes(p.node.init.callee.name)
+    ) {
+      instances.push(p.node.id.name)
+      p.remove()
+    }
   }
 }

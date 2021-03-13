@@ -58,6 +58,10 @@ test('babel-plugin-undebug', function (t) {
   t.end()
 })
 
+/**
+ * @param {string} value Input
+ * @params {string} Output
+ */
 function transform(value) {
   return babel.transformSync(value, {configFile: false, plugins: [plugin]}).code
 }
