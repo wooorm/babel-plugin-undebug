@@ -5,19 +5,56 @@
 [![Downloads][downloads-badge]][downloads]
 [![Size][size-badge]][size]
 
-[Babel][] plugin to remove [`debug`][debug] from code.
-Useful when `debug` is used to debug development and can be stripped in
-production.
+Babel plugin to remove `debug` from code.
+
+## Contents
+
+*   [What is this?](#what-is-this)
+*   [When should I use this?](#when-should-i-use-this)
+*   [Install](#install)
+*   [Use](#use)
+*   [API](#api)
+    *   [`babelPluginUndebug`](#babelpluginundebug)
+*   [Syntax tree](#syntax-tree)
+*   [Types](#types)
+*   [Compatibility](#compatibility)
+*   [Security](#security)
+*   [Related](#related)
+*   [Contribute](#contribute)
+*   [License](#license)
+
+## What is this?
+
+This package is a [Babel][] plugin to remove [`debug`][debug] from code.
+
+## When should I use this?
+
+This package is useful when `debug` is used to debug development code but can be
+stripped in production.
+An example is `micromark`, which is a complex state machine that can be plugged
+into with extensions but it’s also supposed to be small in browsers.
 
 ## Install
 
-This package is ESM only: Node 12+ is needed to use it and it must be `import`ed
-instead of `require`d.
-
-[npm][]:
+This package is [ESM only][esm].
+In Node.js (version 12.20+, 14.14+, or 16.0+), install with [npm][]:
 
 ```sh
 npm install babel-plugin-undebug
+```
+
+In Deno with [Skypack][]:
+
+```js
+import {gemoji} from 'https://cdn.skypack.dev/babel-plugin-undebug@2?dts'
+```
+
+In browsers with [Skypack][]:
+
+```html
+<script type="module">
+  import {gemoji} from 'https://cdn.skypack.dev/babel-plugin-undebug@2?min'
+</script>
 ```
 
 ## Use
@@ -25,9 +62,9 @@ npm install babel-plugin-undebug
 `example.js`:
 
 ```js
-var debug = require('debug')('math')
+const debug = require('debug')('math')
 
-var value = 1
+let value = 1
 debug('Value was %d', value)
 value++
 debug('Now we have %d', value)
@@ -42,38 +79,56 @@ babel example.js --plugins babel-plugin-undebug
 Yields:
 
 ```js
-var value = 1;
+let value = 1;
 value++;
 ```
 
 ## API
 
 This package exports no identifiers.
-There is only a default export.
+The default export is `babelPluginUndebug`.
 
-### `babel-plugin-undebug`
+### `babelPluginUndebug`
 
-This is a [Babel][] plugin.
+Plugin to remove `debug` from code.
 See [its documentation][babel-plugins] on how to use Babel plugins.
 
-###### Notes
+## Syntax tree
 
-*   ESM (`import`) and CJS (`require`) are supported
-*   This looks for the import by string: `'debug'`, other imports are ignored
-*   Both `createDebug`
-    (`var createDebug = require('debug'); d = createDebug('math')`)
-    and direct use
-    (`var d = require('debug')('math')`)
-    are supported
-*   Removes whole debug calls, so side effects
-    (`d(value++)`)
-    will be trimmed
-*   PRs welcome for the other `debug` functionality that might be missing
+This package operates on the Babel (JavaScript) AST.
+
+*   Looks for ESM (`import`) and CJS (`require`) loading `'debug'`
+*   Looks for code calling that function and assigning it, whether `createDebug`
+    (`const createDebug = require('debug'), d = createDebug('math')`)
+    or direct use
+    (`const d = require('debug')('math')`)
+*   Looks for calls of those assigned identifiers and remove whole debug calls,
+    so side effects (`d(value++)`) will be dropped
+
+## Types
+
+This package is fully typed with [TypeScript][].
+There are no extra exported types.
+
+## Compatibility
+
+This package is at least compatible with all maintained versions of Node.js.
+As of now, that is Node.js 12.20+, 14.14+, and 16.0+.
+It also works in Deno and modern browsers.
+
+## Security
+
+This package is safe.
 
 ## Related
 
 *   [`babel-plugin-unassert`](https://github.com/unassert-js/babel-plugin-unassert)
-    — Remove `assert`
+    — remove `assert`
+
+## Contribute
+
+Yes please!
+See [How to Contribute to Open Source][contribute].
 
 ## License
 
@@ -99,9 +154,17 @@ See [its documentation][babel-plugins] on how to use Babel plugins.
 
 [npm]: https://docs.npmjs.com/cli/install
 
+[skypack]: https://www.skypack.dev
+
 [license]: license
 
 [author]: https://wooorm.com
+
+[esm]: https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c
+
+[typescript]: https://www.typescriptlang.org
+
+[contribute]: https://opensource.guide/how-to-contribute/
 
 [debug]: https://github.com/visionmedia/debug
 

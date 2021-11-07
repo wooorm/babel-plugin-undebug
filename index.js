@@ -4,7 +4,7 @@
  */
 
 /**
- * Plugin to remove `debug` calls (and require/import).
+ * Plugin to remove `debug` from code.
  *
  * @returns {PluginObj}
  */
