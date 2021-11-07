@@ -65,7 +65,7 @@ export default function undebug() {
 
         // Likely an identifier but can be other things.
         /* c8 ignore next 3 */
-        if (p.node.id.type !== 'Identifier') {
+        if (p.node.id.type !== 'Identifier' || !p.node.init) {
           return
         }
 

@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import test from 'tape'
 import babel from '@babel/core'
 import plugin from './index.js'
@@ -63,5 +64,10 @@ test('babel-plugin-undebug', function (t) {
  * @params {string} Output
  */
 function transform(value) {
-  return babel.transformSync(value, {configFile: false, plugins: [plugin]}).code
+  const result = babel.transformSync(value, {
+    configFile: false,
+    plugins: [plugin]
+  })
+  assert(result !== null, 'expected result')
+  return result.code
 }
