@@ -43,17 +43,17 @@ In Node.js (version 12.20+, 14.14+, or 16.0+), install with [npm][]:
 npm install babel-plugin-undebug
 ```
 
-In Deno with [Skypack][]:
+In Deno with [`esm.sh`][esmsh]:
 
 ```js
-import {gemoji} from 'https://cdn.skypack.dev/babel-plugin-undebug@2?dts'
+import babelPluginUndebug from 'https://esm.sh/babel-plugin-undebug@2'
 ```
 
-In browsers with [Skypack][]:
+In browsers with [`esm.sh`][esmsh]:
 
 ```html
 <script type="module">
-  import {gemoji} from 'https://cdn.skypack.dev/babel-plugin-undebug@2?min'
+  import babelPluginUndebug from 'https://esm.sh/babel-plugin-undebug@2?bundle'
 </script>
 ```
 
@@ -154,7 +154,7 @@ See [How to Contribute to Open Source][contribute].
 
 [npm]: https://docs.npmjs.com/cli/install
 
-[skypack]: https://www.skypack.dev
+[esmsh]: https://esm.sh
 
 [license]: license
 
