@@ -40,7 +40,7 @@ test('babel-plugin-undebug', function (t) {
 
   t.equal(
     transform('var a = require("assert"); assert("a");'),
-    'var a = require("assert");\n\nassert("a");',
+    'var a = require("assert");\nassert("a");',
     'should not remove other require calls'
   )
 
