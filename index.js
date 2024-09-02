@@ -1,6 +1,6 @@
 /**
- * @typedef {import('@babel/core').PluginObj} PluginObj
- * @typedef {import('@babel/types').Expression} Expression
+ * @import {PluginObj} from '@babel/core'
+ * @import {Expression} from '@babel/types'
  */
 
 /**
