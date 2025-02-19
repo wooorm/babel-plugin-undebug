@@ -78,6 +78,45 @@ export default function undebug() {
         ) {
           instances.push(p.node.id.name)
           p.remove()
+        } else if (
+          p.node.init.type === 'Identifier' &&
+          instances.includes(p.node.init.name)
+        ) {
+          instances.push(p.node.id.name)
+          p.remove()
+        } else if (
+          p.node.init.type === 'MemberExpression' &&
+          p.node.init.object.type === 'Identifier' &&
+          instances.includes(p.node.init.object.name)
+        ) {
+          instances.push(p.node.id.name)
+          p.remove()
+        }
+      },
+      MemberExpression(p, state) {
+        const instances = /** @type {string[]} */ (
+          state.undebugInstances || (state.undebugInstances = [])
+        )
+
+        if (
+          p.node.object.type === 'Identifier' &&
+          instances.includes(p.node.object.name)
+        ) {
+          if (
+            // Check if this member expression is being used as a function call
+            // and remove the whole call. e.g. log.log("").
+            p.parent.type === 'CallExpression' &&
+            p.parent.callee === p.node
+          ) {
+            p.parentPath.remove()
+          } else {
+            // Otherwise accessing property on a debug instance, replace with
+            // undefined e.g. log.enabled, log.color, log.namespace, etc.
+            p.replaceWith({
+              type: 'Identifier',
+              name: 'undefined'
+            })
+          }
         }
       }
     }
